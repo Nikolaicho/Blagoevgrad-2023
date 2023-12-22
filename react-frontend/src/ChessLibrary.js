@@ -861,6 +861,7 @@ class Chess{
       piecesArray.push(this.createPawns(1,"w",0))
       piecesArray.push(this.createPieces(0,placement,"w",0))
     }
+
     if(color === "b"){
       piecesArray.push(this.createPieces(0,placement,"w",1))
       piecesArray.push(this.createPawns(1,"w",1))
@@ -887,7 +888,6 @@ class Chess{
     let enemyking = document.getElementById(`${enemyColor}k4`)
     let kingCords = enemyking.classList[0]
 
-    //TODO: DA SE PREMAHNE POVTORENIETO NA PROMENLIVATA
     let functionList = {
       "p": (pieceId) => this.PawnMove(pieceId),
       "n": (pieceId) => this.knightMove(pieceId),
@@ -913,7 +913,6 @@ class Chess{
     let checkedPlaces = []
     let checkingPieces = []
     for(let i = 0; i < 8; i++){
-      
       //намира всички налични пешки
       let pawnID = `${color}p${i}`
       let pawn = document.getElementById(pawnID) 
@@ -927,6 +926,7 @@ class Chess{
       //аналогично на цикъла за пешките
       let pieceID = `${color}${placement[i]}${i}`
       let piece = document.getElementById(pieceID)
+
       if(piece !== undefined){
         let checkedPlacesByPieces = functionList[placement[i]](pieceID)
         isPieceChecking(checkedPlacesByPieces,pieceID)
@@ -939,14 +939,15 @@ class Chess{
 
     return false
   }
+
   checkPath(chekingPieceID){
-    let enemyKing = document.getElementById("wk4")
     let checkingPiece = document.getElementById(chekingPieceID)
     let color = this.getPieceColor(checkingPiece)
     let checkingCords = this.getPieceCords(checkingPiece)
     let x1 = checkingCords[0]
     let y1 = checkingCords[1]
 
+    let enemyKing = document.getElementById("wk4")
     if(color == "w"){
       enemyKing = document.getElementById(`bk4`)
     }
@@ -1009,15 +1010,17 @@ class Chess{
 
   isPinned(color){
     //TODO:
-    //коментари
-    // възможно е да има проблеми с шах
+    //възможно е да има проблеми с шах
 
+    //намира царя, ако не е мърдал.
     let king = document.getElementById(`${color}k4`)
     
+    //намира го ако е xd
     if(king == undefined){
       king = document.getElementById(`${color}k4n`)
     }
     
+    //кординати на царя
     let kingCords = this.getPieceCords(king)
     let kingX = kingCords[0]
     let kingY = kingCords[1]
@@ -1027,15 +1030,16 @@ class Chess{
       let piecesontheWay = 0 
       let isPinnable = false
       let possibleMoves = []
-      for(let i = 1; i < 8; i++){
-        
+
+      for(let i = 1; i < 8; i++){  
         let nextSquare = document.getElementsByClassName(`${x+(i*dx)}${y+(i*dy)}`)[0]
+
         if(nextSquare == undefined){
           break;
         }
+
         possibleMoves.push(nextSquare.classList[0])
         if(nextSquare.id[0] != "e" ){
-
           if(nextSquare.id[0] != color && pieceClass.includes(nextSquare.id[1])){
             isPinnable = true
             break
@@ -1045,11 +1049,13 @@ class Chess{
             piecesontheWay++;
             pinnedPiece = nextSquare.id
           }
+
           else if(nextSquare.id[0] != color){
             isPinnable = false
             break;
           }
         }
+
         if(piecesontheWay > 1){
           isPinnable = false
           break;
@@ -1059,6 +1065,7 @@ class Chess{
       if(isPinnable){
         return [pinnedPiece,possibleMoves]
       }
+
       else{
         return [false]
       }
@@ -1074,19 +1081,21 @@ class Chess{
       [-1, 1, ["b", "q"]],  // up-right
       [1, -1, ["b", "q"]]   // down-left
     ]
+
     let resultsArray = []
     for (const [dx, dy, pieceTypes] of directions) {
       const result = checkforPin(kingX, kingY, color, dx, dy, pieceTypes);
-      
       if (result[0]) {
         resultsArray.push(result);
       }
     }
+    
     return resultsArray
   }
 
   createPieces(i,placement,color,a){
     //ТODO:премахване на а и оптимизация
+
     //създава фигури според даден цвят и подредба
     let temp=[]
     if(a == 1){
@@ -1096,6 +1105,7 @@ class Chess{
         )
       }
     }
+
     if(a == 0){
       for(let j=0;j<8;j++){
         temp.push(
@@ -1108,6 +1118,7 @@ class Chess{
 
   createPawns(i,color,a){
     //ТODO:премахване на а и оптимизация
+
     //създава пешки по цвят
     let temp=[]
     if(a == 1){
@@ -1132,6 +1143,7 @@ class Chess{
   createEmptySpaces(k,color){
     //създава празни места
     let temp=[]
+
     if(color == "w"){
       for(let j = 0; j < 8; j++){
         temp.push(
@@ -1139,6 +1151,7 @@ class Chess{
         )
       }
     }
+
     else if(color == "b"){
       for(let j = 7; j >= 0; j--){
         temp.push(
@@ -1146,6 +1159,7 @@ class Chess{
         )
       }
     }
+    
     return temp
   }  
 }
