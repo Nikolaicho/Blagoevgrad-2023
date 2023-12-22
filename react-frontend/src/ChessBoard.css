@@ -1,0 +1,75 @@
+.grid-element{
+    width:60px;
+}
+.white{
+    background-color: white;
+    border:0.2px solid rgb(41, 39, 39); 
+}
+.black{
+    background-color: rgb(41, 39, 39);
+}
+.grid-container {
+    position: relative;
+    
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(8, 60px); 
+    grid-template-rows: repeat(8, 60px);
+    position: absolute;
+}
+.grid1 {
+    z-index: 1; /* Set a higher z-index for the first grid to make it appear on top */
+}
+.baseStyle{
+    width: 60px;
+    height: 60px;
+    background-size: cover; /* Adjust the size of the image */
+    background-position: center; /* Position the image in the center */
+}
+.wp{
+    background-image: url('./chess-pieces/white-pawn.png');
+}
+.wr{
+    background-image: url('./chess-pieces/white-rook.png');
+}
+.wq{
+    background-image: url('./chess-pieces/white-queen.png');
+}
+.wk{
+    background-image: url('./chess-pieces/white-king.png');
+}
+.wb{
+    background-image: url('./chess-pieces/white-bishop.png');
+}
+.wn{
+    background-image: url('./chess-pieces/white-knight.png');
+}
+
+.bp{
+    background-image: url('./chess-pieces/black-pawn.png');
+}
+.br{
+    background-image: url('./chess-pieces/black-rook.png');
+}
+.bq{
+    background-image: url('./chess-pieces/black-queen.png');
+}
+.bk{
+    background-image: url('./chess-pieces/black-king.png');
+}
+.bb{
+    background-image: url('./chess-pieces/black-bishop.png');
+}
+.bn{
+    background-image: url('./chess-pieces/black-knight.png');
+}
+#promoting-panel{
+    display: none;
+    position: absolute;
+    left: 1000p;
+    top:500px
+}
+button{
+    height: 1000px;
+}
