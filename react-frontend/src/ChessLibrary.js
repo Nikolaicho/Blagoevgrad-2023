@@ -1,6 +1,6 @@
-//TODO: разгледай системата за рокиране
+//TODO: 
 //оправи форматирането на кода 
-//разгледай
+//премахни ненужните функции
 
 let placement={
   0:"r",
@@ -15,7 +15,6 @@ let placement={
 }
 
 class Chess{
-
   //запазва връзката, която е дадена в началото 
   constructor(ws) {
     this.ws = ws;
@@ -26,6 +25,7 @@ class Chess{
     element.replaceWith(clone); // заменя стария елемент с новия клонинг, който няма евент лисънър
     return clone;
   }
+
   getPieceColor(piece){
     if(piece.classList[3] === "empty"){
       return "empty"
@@ -33,12 +33,21 @@ class Chess{
     // видът на фигурата винаги се пази във формат цвят фигура номер (пример wr0) и е на 4 позиция в масива.
     return piece.id[0]
   }
+
   getPieceCords(piece){
     let location = piece.classList[0]
     // кординатите са във формат xy
     return [parseInt(location[0]) , parseInt(location[1])]
   }
   
+  getNewEmptyId(){
+    for(let i = 0; i < 100; i++){
+      if(document.getElementById(`e${i}`) == undefined){
+        return `e${i}`
+      }
+    }
+  }
+
   PawnMove(pawnID){
     //намира пешката, която е кликната и запазва кординатите й в променливи
     let pawn = document.getElementById(pawnID)
@@ -56,14 +65,14 @@ class Chess{
 
       if(x === 1){
         for(let i = 1; i < 3; i++){
-          if(document.getElementsByClassName(`${x+i}${y}`)[0].classList[3] === "empty"){
+          if(document.getElementsByClassName(`${x+i}${y}`)[0].id[0] === "e"){
             possibleMoves.push(`${x+i}${y}`)
           }
         }
       }
 
       else if(x !== 1){
-        if(document.getElementsByClassName(`${x+1}${y}`)[0].classList[3] === "empty"){
+        if(document.getElementsByClassName(`${x+1}${y}`)[0].id[0] === "e"){
           possibleMoves.push(`${x+1}${y}`)
         }
       }
@@ -92,14 +101,14 @@ class Chess{
     else if(color == "b"){
       if(x === 6){
         for(let i = 1; i < 3; i++){
-          if(document.getElementsByClassName(`${x-i}${y}`)[0].classList[3] === "empty"){
+          if(document.getElementsByClassName(`${x-i}${y}`)[0].id[0] === "e"){
             possibleMoves.push(`${x-i}${y}`)
           }
         }
       }
 
       else if(x !== 6){
-        if(document.getElementsByClassName(`${x-1}${y}`)[0].classList[3] === "empty"){
+        if(document.getElementsByClassName(`${x-1}${y}`)[0].id[0] === "e"){
           possibleMoves.push(`${x-1}${y}`)
         }
       }
@@ -138,8 +147,8 @@ class Chess{
     localStorage.setItem("possibleMoves",possibleMoves)
     return possibleForChecks
   }
+
   swapPlaces(destinationSquare,piece){
-    
     let pieceID = piece.id
     let pieceClass = piece.classList[3]
 
@@ -149,20 +158,16 @@ class Chess{
 
     // добавя индикатор че фигурата не може повече да се ползва за рокадо.
     if((piece.id[1] === "k" || piece.id[1] == "r") && pieceID.length == 3){
-      console.log("dimov qk")
       piece.id = destinationSquare.id
       destinationSquare.id = pieceID + "n"
     }
+
+    // дава ид на квадратчетата, които се превръщат в празни при взимане на фигура
     else if(destinationSquare.id[0] !== "e"){
-      
-      for(let i = 0; i < 100; i++){
-        if(document.getElementById(`e${i}`) == undefined){
-          piece.id = `e${i}`
-          break
-        }
-      }
+      piece.id = this.getNewEmptyId()
       destinationSquare.id = pieceID
     }
+
     else{
       piece.id = destinationSquare.id
       destinationSquare.id = pieceID
@@ -180,8 +185,8 @@ class Chess{
       this.makePromotePanelAppear(destinationSquare.id,"b")
     }
   }
+
   addEventListenerToPieces(piece,pieceClass){
-    // обект който сочи към функции спрямо дадената фигура 
     let functionList = {
       "p": (pieceId) => this.PawnMove(pieceId),
       "n": (pieceId) => this.knightMove(pieceId),
@@ -196,6 +201,7 @@ class Chess{
       functionList[pieceClass](piece.id);
     });
   }
+
   addEventListeners(emptySquare,piece){
     //маха стари евент лисънъри от този обект
     let newPiece = this.removeAllEventListeners(piece)
@@ -207,18 +213,18 @@ class Chess{
     this.addEventListenerToPieces(newPiece,pieceClass)
 
     //слага евент лисънър на новото празно поле
-    let formerPiece=this.removeAllEventListeners(emptySquare)
-    formerPiece.addEventListener("click",function (){
+    let formerPiece = this.removeAllEventListeners(emptySquare)
+    formerPiece.addEventListener("click",() =>{
       this.emptySpace(formerPiece)
-    }.bind(this))
+    })
   }
 
   knightMove(knightID){
     //намира коня и кординатите му
     let knight = document.getElementById(knightID)
-    let x=this.getPieceCords(knight)[0]
-    let y=this.getPieceCords(knight)[1]
-    let possibleMoves=[]
+    let x = this.getPieceCords(knight)[0]
+    let y = this.getPieceCords(knight)[1]
+    let possibleMoves = []
      
     for(let i = 2; i > 0; i--){
       let x1 = x-i
@@ -239,15 +245,15 @@ class Chess{
         if(y1 >= 0 ){
           possibleMoves.push(`${x1}${y1}`)
         }
-        if(y2<8){
+        if(y2 < 8){
           possibleMoves.push(`${x1}${y2}`)
         }
       }
-      if(x2<8){
-        if(y1>= 0 ){
+      if(x2 < 8){
+        if(y1 >= 0 ){
           possibleMoves.push([`${x2}${y1}`])
         }
-        if(y2<8){
+        if(y2 < 8){
           possibleMoves.push(`${x2}${y2}`)
         }
       }
@@ -297,20 +303,23 @@ class Chess{
   }
 
   rookPossibleMoves(x,y,color){
-    let possibleMoves=[]
+    let possibleMoves = []
     
     //нагоре 
     for(let i = 1; i < 8; i++){
       if(x+i > 7){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x+i}${y}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x+i}${y}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x+i}${y}`)
     }
 
@@ -319,13 +328,16 @@ class Chess{
       if(x-i < 0){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x-i}${y}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x-i}${y}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x-i}${y}`)
     }
 
@@ -334,13 +346,16 @@ class Chess{
       if(y+i > 7){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x}${y+i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x}${y+i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x}${y+i}`)
     }
 
@@ -349,13 +364,16 @@ class Chess{
       if(y-i < 0){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x}${y-i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x}${y-i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x}${y-i}`)
     }
     return possibleMoves
@@ -368,13 +386,16 @@ class Chess{
       if(x+i > 7 || y+i > 7){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x+i}${y+i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x+i}${y+i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x+i}${y+i}`)
     }
 
@@ -383,13 +404,16 @@ class Chess{
       if(x + i > 7 || y - i < 0){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x+i}${y-i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x+i}${y-i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x+i}${y-i}`)
     }
     //долу дясно
@@ -397,32 +421,38 @@ class Chess{
       if(x - i < 0 || y + i > 7){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x-i}${y+i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x-i}${y+i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x-i}${y+i}`)
     }
     //долу ляво
     for(let i = 1; i < 8; i++){
-      if(x - i < 0 || y - i<0){
+      if(x - i < 0 || y - i < 0){
         break;
       }
+
       let nextSquareInLine = document.getElementsByClassName(`${x-i}${y-i}`)[0]
+
       if(this.getPieceColor(nextSquareInLine) !== "empty"){
         if(color !== this.getPieceColor(nextSquareInLine)){
           possibleMoves.push(`${x-i}${y-i}`)
         } 
         break;
       }
+
       possibleMoves.push(`${x-i}${y-i}`)
-      
     } 
     return possibleMoves
   }
+
   queenMove(queenID){
     //намира дамата и кординатите й
     let queen = document.getElementById(queenID);
@@ -440,6 +470,7 @@ class Chess{
     localStorage.setItem("lastPiece",queenID)
     return possibleMoves
   }
+
   kingMove(kingID){
     let king = document.getElementById(kingID);
     let kingColor = this.getPieceColor(king)
@@ -458,6 +489,7 @@ class Chess{
       for(let j = -1; j < 2; j++){
         if((x+i >= 0 && x+i < 8) && (y+j >= 0 && y+j < 8)){
           let square = document.getElementsByClassName(`${x+i}${y+j}`)[0]
+
           if(square && (square.classList.contains("empty") || square.classList[3][0] != kingColor )){
             possibleMoves.push(`${x+i}${y+j}`)
           }
@@ -467,6 +499,7 @@ class Chess{
 
     // проверява дали лявата страна е свободна и може да се рокира
     function checkLeftSideCastle(numberOfSpaces,color){
+      //перспективата на черните е различна и в лявата част вместо 00 кординатите са 77
         if(color == "b"){
           for(let i = 1; i <= numberOfSpaces; i++){
             if(!document.getElementsByClassName(`7${7-i}`)[0].classList.contains("empty")){
@@ -474,6 +507,7 @@ class Chess{
             }
           }
         }
+
         else{
           for(let i = 1; i <= numberOfSpaces; i++){
             if(!document.getElementsByClassName(`0${i}`)[0].classList.contains("empty")){
@@ -486,15 +520,17 @@ class Chess{
 
     // проверява дали дясната страна е свободна и може да се рокира
     function checkRightSideCastle(numberOfSpaces,color){
+      //перспективата на черните е различна и в лявата част вместо 07 кординатите са 70
       if(color == "b"){
-        for(let i = 1;i <= numberOfSpaces;i++){
+        for(let i = 1; i <= numberOfSpaces; i++){
           if(!document.getElementsByClassName(`7${i}`)[0].classList.contains("empty")){
             return false;
           }
         }
       }
+
       else{
-        for(let i = numberOfSpaces;i>0;i--){
+        for(let i = numberOfSpaces; i > 0; i--){
           if(!document.getElementsByClassName(`0${7-i}`)[0].classList.contains("empty")){
             return false;
           }
@@ -521,6 +557,7 @@ class Chess{
       if(canCastleShort){
         possibleMoves.push(`76`)
       }
+
       if(canCastleLong){
         possibleMoves.push("72")
       }
@@ -530,12 +567,15 @@ class Chess{
       if(document.getElementById("wr0")){
         canCastleLong = checkLeftSideCastle(3,"w");
       }
+
       if(document.getElementById("wr7")){
         canCastleShort = checkRightSideCastle(2,"w");
       }
+
       if(canCastleLong){
         possibleMoves.push(`02`)
       }
+
       if(canCastleShort){
         possibleMoves.push("06")
       }
@@ -547,7 +587,6 @@ class Chess{
   }
 
   castleKing(rookID,cords){
-    
     //намира топа и празното поле, на което той трябва да се премести
     let rook = document.getElementById(rookID)
     let color = rook.id[0]
@@ -567,11 +606,11 @@ class Chess{
     rook.classList.add("empty")
 
     //добавя нови евент лисънъри спрямо новите функции на квадратчетата
-    rook.addEventListener("click",()=>{
+    rook.addEventListener("click", () => { 
       this.emptySpace(rook)
     })
   
-    newPlaceForRook.addEventListener("click",()=>{
+    newPlaceForRook.addEventListener("click",() => {
       this.rookMove(newPlaceForRook)
     })
   }
@@ -583,18 +622,14 @@ class Chess{
 
     //слага функция, която го прави празно поле официално 
     enPassanSquare = this.removeAllEventListeners(enPassanSquare)
-    enPassanSquare.addEventListener("click",()=>{
+    enPassanSquare.addEventListener("click",() => {
       this.emptySpace(enPassanSquare)
     })
 
     //взима се ново ид за новонаправеното празно поле
-    for(let i = 0; i < 100; i++){
-      if(document.getElementById(`e${i}`) == undefined){
-        enPassanSquare.id = `e${i}`
-        break;
-      }
-    }
+    enPassanSquare.id = this.getNewEmptyId()
 
+    //премахва се възможността за ан пасан
     enPassanSquare.removeAttribute("ep")
   }
 
@@ -604,10 +639,12 @@ class Chess{
     let emptySquareCords = emptySquare.classList[0]
     let possibleMoves = localStorage.getItem("possibleMoves").split(",")
     let color = piece.id[0]
-    let checked = localStorage.getItem("checked")
-    let checkingPiece = localStorage.getItem("checkingPiece")
     let ws = this.ws
     
+
+    let checked = localStorage.getItem("checked")
+    let checkingPiece = localStorage.getItem("checkingPiece")
+
     //ако царят е в шах се проверява на кои полета фигурите могат да застанат, за да предотвратят шах
     if(checked == "true"){
       let newPossibleMoves = []
@@ -615,7 +652,6 @@ class Chess{
 
       //проверява дали фигурата, която е селектирана може да прикрие шаха
       for(let i = 0; i < possibleMoves.length; i++){
-
         //изключваме царя,защото той не може да прикрие шах
         if(possibleMovesToPreventCheck.includes(possibleMoves[i]) && piece.id[1] !== "k"){
           newPossibleMoves.push(possibleMoves[i])
@@ -637,8 +673,8 @@ class Chess{
     
     //проверява дали селектирана фигура е свързана или не 
     let pinnedPieceIndex = pinnedPieces.indexOf(localStorage.getItem("lastPiece"))
-    if(pinnedPieceIndex != -1){
 
+    if(pinnedPieceIndex != -1){
       //ако са свързани им задава възможните ходове 
       let newPossibleMoves = []
       for(let i = 0;i < possibleMoves.length;i++){
@@ -655,12 +691,12 @@ class Chess{
 
         //събира нужната за направа на ход информация
         let infoAboutMove={
-          "type":"move",
-          "color":color,
-          "destinationCords":emptySquareCords,
-          "currentCords":piece.classList[0],
-          "pieceMoved":piece.id,
-          "game_id":localStorage.getItem("game_id")
+          type:"move",
+          color:color,
+          destinationCords:emptySquareCords,
+          currentCords:piece.classList[0],
+          pieceMoved:piece.id,
+          game_id:localStorage.getItem("game_id") // TODO:това трябва да се направи на бисквитка
         }
         
         //проверки за рокадо
@@ -685,17 +721,19 @@ class Chess{
         let enPassanSquareBlack = document.getElementsByClassName(enPassanCordsBlack)[0]
 
         if(piece.classList[3] == "wp" && enPassanSquareWhite.classList[3] == "bp" && enPassanSquareWhite.getAttribute("ep") == "true"){
-          //когато се установи взимане ан пасан се праща специална заявка и действието се изпълнява
           this.enPassant(enPassanSquareWhite,"bp")
+
+          //когато се установи взимане ан пасан се праща специална заявка и действието се изпълнява
           infoAboutMove = {
             type:"ep",
             color:"w",
             enPassantCords:enPassanCordsWhite,
             destinationCords:emptySquareCords,
-            "game_id":localStorage.getItem("game_id"),
-            "pieceMoved":piece.id,
+            game_id:localStorage.getItem("game_id"),
+            pieceMoved:piece.id,
           }
         }
+
         if(piece.classList[3] == "bp" && enPassanSquareBlack.classList[3] == "wp" && enPassanSquareBlack.getAttribute("ep") == "true"){
           this.enPassant(enPassanSquareBlack,"wp")
           infoAboutMove = {
@@ -732,6 +770,7 @@ class Chess{
   }
 
   makePromotePanelAppear(pawnID,color){
+    //TODO: Различни цветове фигури спрямо пешката която се повишава
     //подредба на фигурите в списъка
     let pieces={
       0:"q",
@@ -745,10 +784,10 @@ class Chess{
 
     //цикъл, който слага евент лисънъри за панела за повишаване
     for (let i = 0; i < promotingPanel.childNodes.length; i++) {
-
       //всяка фигура, която е намерена в панела получава евент лисънър, който повишава пешката във съответната фигура
       let piece = promotingPanel.childNodes[i];
-      piece.addEventListener("click",()=>{
+
+      piece.addEventListener("click",() => {
         this.promotePawn(pawnID,pieces[i],color)
       })
     }
@@ -768,22 +807,23 @@ class Chess{
     
       //проверяваме свободните id-та и записваме фигурата с най-ниското възможно
       for(let i = 0; i < 9; i++){
-      if(document.getElementById(`${color}${promotePiece}${i}`) == null){
-        promotingPawn.id=`${color}${promotePiece}${i}`
-        break;
+        if(document.getElementById(`${color}${promotePiece}${i}`) == null){
+          promotingPawn.id=`${color}${promotePiece}${i}`
+          break;
+        }
       }
-    }
     
-    //слага евент лисънър спрямо избраната фигура
-    this.addEventListenerToPieces(promotingPawn,promotePiece)
+      //слага евент лисънър спрямо избраната фигура
+      this.addEventListenerToPieces(promotingPawn,promotePiece)
 
-    //премахва панела за повишаване
-    let promotingPanel = document.getElementById("promoting-panel")
-    promotingPanel.style.display="none";
+      //премахва панела за повишаване
+      let promotingPanel = document.getElementById("promoting-panel")
+      promotingPanel.style.display = "none";
     }
   }
+
   makeGrid(){
-    let chessBoard=[]
+    let chessBoard = []
     for (let i = 0; i < 8; i++) {
       //в зависимост от номера на реда първия цвят се редува
         if(i % 2 == 0){
@@ -793,8 +833,9 @@ class Chess{
             );
           }
         }
+
         if(i % 2 == 1){
-          for(let k = 0;k < 8; k++ ){
+          for(let k = 0; k < 8; k++ ){
             chessBoard.push(
               <div className={k % 2 === 1 ? "white grid-item" : "black grid-item"}></div>
             );
@@ -803,8 +844,9 @@ class Chess{
       }
     return chessBoard;
   }
+  
   renderPieces(color){
-    let piecesArray=[]
+    let piecesArray = []
     if(color === "w"){
       //създава черните фигури 
       piecesArray.push(this.createPieces(7,placement,"b",0))
@@ -833,6 +875,7 @@ class Chess{
 
     return piecesArray;
   } 
+
   isChecked(color){
     //TODO: KAKVO STAVA AKO IMA DVOEN SHAH
     let enemyColor = "w"
@@ -914,56 +957,48 @@ class Chess{
     
     let possibleMoves = []
     if(x1 > x2 && y1 == y2){
-      //raboti napulno izrqdno
       for(let i = x2+1; i <= x1; i++){
         possibleMoves.push(`${i}${y1}`)
       } 
       // gore
     }
     else if(x1 < x2 && y1 == y2){
-      //raboti izrqdno
       for(let i = x1; i < x2; i++){
         possibleMoves.push(`${i}${y1}`)
       } 
       //dolu 
     }
     else if(x1 == x2 && y1 > y2){
-      //raboti izrqdno
       for(let i = y2+1; i <= y1; i++){
         possibleMoves.push(`${x1}${i}`)
       }
       //dqsno 
     }
     else if(x1 == x2 && y1 < y2){
-      // raboti napulno izrqdno
       for(let i = y1; i < y2; i++){
         possibleMoves.push(`${x1}${i}`)
       } 
       // lqvo
     }
     else if(x1 > x2 && y1 < y2){
-      //izrqdno
       for(let i = 0; i < x1-x2;i++){
         possibleMoves.push(`${x1-i}${y1+i}`)
       }
        // gore lqvo
     }
     else if(x1 > x2 && y1 > y2){
-      //raboti izrqdno
       for(let i = 1; i <= x1-x2;i++){
         possibleMoves.push(`${x2+i}${y2+i}`)
       }
        // gore dqsno
     }
     else if(x1 < x2 && y1 < y2){
-      //raboti izrqdno
       for(let i = 1; i < y2-y1;i++){
         possibleMoves.push(`${x1+i}${y1+i}`)
       }
        // dolu lqvo
     }
     else if(x1 < x2 && y1 > y2){
-      //raboti izrqdno
       for(let i = 1; i < y1-y2;i++){
         possibleMoves.push(`${x1+i}${y1-i}`)
       }
@@ -973,9 +1008,8 @@ class Chess{
   }
 
   isPinned(color){
-    //TODO:kwo stava ako ima 2 ili poveche pina
-    //kvo stava ako ima shah
-    //TODO:направи коментари
+    //TODO:
+    //коментари
     // възможно е да има проблеми с шах
 
     let king = document.getElementById(`${color}k4`)
@@ -1051,11 +1085,8 @@ class Chess{
     return resultsArray
   }
 
-  isMated(){
-
-  }
-
   createPieces(i,placement,color,a){
+    //ТODO:премахване на а и оптимизация
     //създава фигури според даден цвят и подредба
     let temp=[]
     if(a == 1){
@@ -1076,6 +1107,7 @@ class Chess{
   }
 
   createPawns(i,color,a){
+    //ТODO:премахване на а и оптимизация
     //създава пешки по цвят
     let temp=[]
     if(a == 1){
